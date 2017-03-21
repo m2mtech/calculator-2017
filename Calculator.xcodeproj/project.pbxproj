@@ -54,14 +54,22 @@
 		5BBA29981E81E38D00333367 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
-				5BBA29991E81E38D00333367 /* AppDelegate.swift */,
 				5BBA299B1E81E38D00333367 /* ViewController.swift */,
 				5BBA299D1E81E38D00333367 /* Main.storyboard */,
+				5BBA29AB1E81E4FC00333367 /* Supporting Files */,
+			);
+			path = Calculator;
+			sourceTree = "<group>";
+		};
+		5BBA29AB1E81E4FC00333367 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				5BBA29991E81E38D00333367 /* AppDelegate.swift */,
 				5BBA29A01E81E38D00333367 /* Assets.xcassets */,
 				5BBA29A21E81E38D00333367 /* LaunchScreen.storyboard */,
 				5BBA29A51E81E38D00333367 /* Info.plist */,
 			);
-			path = Calculator;
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -96,7 +104,7 @@
 				TargetAttributes = {
 					5BBA29951E81E38D00333367 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = EN82842PS8;
+						DevelopmentTeam = ZZANS5H429;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -261,7 +269,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = EN82842PS8;
+				DEVELOPMENT_TEAM = ZZANS5H429;
 				INFOPLIST_FILE = Calculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = at.m2m.Calculator;
@@ -274,7 +282,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = EN82842PS8;
+				DEVELOPMENT_TEAM = ZZANS5H429;
 				INFOPLIST_FILE = Calculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = at.m2m.Calculator;
