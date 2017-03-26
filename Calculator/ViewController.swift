@@ -55,5 +55,28 @@ class ViewController: UIViewController {
         }
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        adjustButtonLayout(for: view, isPortrait: traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular)
+    }
+    
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+        adjustButtonLayout(for: view, isPortrait: newCollection.horizontalSizeClass == .compact && newCollection.verticalSizeClass == .regular)
+    }
+    
+    private func adjustButtonLayout(for view: UIView, isPortrait: Bool) {
+        for subview in view.subviews {
+            if subview.tag == 1 {
+                subview.isHidden = isPortrait
+            } else if subview.tag == 2 {
+                subview.isHidden = !isPortrait
+            }
+            if let stack = subview as? UIStackView {
+                adjustButtonLayout(for: stack, isPortrait: isPortrait);
+            }
+        }
+    }
+
 }
 
