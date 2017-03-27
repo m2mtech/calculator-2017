@@ -72,11 +72,27 @@ class ViewController: UIViewController {
             } else if subview.tag == 2 {
                 subview.isHidden = !isPortrait
             }
-            if let stack = subview as? UIStackView {
+            if let button = subview as? UIButton {
+                button.setBackgroundColor(UIColor.black, forState: .highlighted)
+                button.setTitleColor(UIColor.white, for: .highlighted)
+            } else if let stack = subview as? UIStackView {
                 adjustButtonLayout(for: stack, isPortrait: isPortrait);
             }
         }
     }
 
+}
+
+extension UIButton {
+    func setBackgroundColor(_ color: UIColor, forState state: UIControlState) {
+        let rect = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, 0)
+        let context = UIGraphicsGetCurrentContext();
+        color.setFill()
+        context!.fill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        setBackgroundImage(image, for: state);
+    }
 }
 
