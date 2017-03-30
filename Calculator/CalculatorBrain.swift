@@ -25,55 +25,56 @@ func factorial(_ op1: Double) -> Double {
 
 struct CalculatorBrain {
     
-    private var accumulator: Double?
+    private var accumulator: (Double, String)?
     
     private enum Operation {
         case constant(Double)
-        case unaryOperation((Double) -> Double)
-        case binaryOperation((Double, Double) -> Double)
+        case unaryOperation((Double) -> Double, (String) -> String)
+        case binaryOperation((Double, Double) -> Double, (String, String) -> String)
         case equals
     }
     
     private let operations: Dictionary<String,Operation> = [
         "π": Operation.constant(Double.pi),
         "e": Operation.constant(M_E),
-        "√": Operation.unaryOperation(sqrt),
-        "cos": Operation.unaryOperation(cos),
-        "±": Operation.unaryOperation({ -$0 }),
-        "×": Operation.binaryOperation(*),
-        "÷": Operation.binaryOperation(/),
-        "+": Operation.binaryOperation(+),
-        "-": Operation.binaryOperation(-),
+        "√": Operation.unaryOperation(sqrt, { "√(" + $0 + ")" }),
+        "cos": Operation.unaryOperation(cos, { "cos(" + $0 + ")" }),
+        "±": Operation.unaryOperation({ -$0 }, { "-(" + $0 + ")" }),
+        "×": Operation.binaryOperation(*, { $0 + "×" + $1 }),
+        "÷": Operation.binaryOperation(/, { $0 + "÷" + $1 }),
+        "+": Operation.binaryOperation(+, { $0 + "+" + $1 }),
+        "-": Operation.binaryOperation(-, { $0 + "-" + $1 }),
         "=": Operation.equals,
         
-        "x²" : Operation.unaryOperation({ pow($0, 2) }),
-        "x³" : Operation.unaryOperation({ pow($0, 3) }),
-        "x⁻¹" : Operation.unaryOperation({ 1 / $0 }),
-        "sin" : Operation.unaryOperation(sin),
-        "tan" : Operation.unaryOperation(tan),
-        "sinh" : Operation.unaryOperation(sinh),
-        "cosh" : Operation.unaryOperation(cosh),
-        "tanh" : Operation.unaryOperation(tanh),
-        "ln" : Operation.unaryOperation(log),
-        "log" : Operation.unaryOperation(log10),
-        "eˣ" : Operation.unaryOperation(exp),
-        "10ˣ" : Operation.unaryOperation({ pow(10, $0) }),
-        "x!" : Operation.unaryOperation(factorial),
-        "xʸ" : Operation.binaryOperation(pow),
+        "x²" : Operation.unaryOperation({ pow($0, 2) }, { "(" + $0 + ")²" }),
+        "x³" : Operation.unaryOperation({ pow($0, 3) }, { "(" + $0 + ")³" }),
+        "x⁻¹" : Operation.unaryOperation({ 1 / $0 }, {  "(" + $0 + ")⁻¹" }),
+        "sin" : Operation.unaryOperation(sin, { "sin(" + $0 + ")" }),
+        "tan" : Operation.unaryOperation(tan, { "tan(" + $0 + ")" }),
+        "sinh" : Operation.unaryOperation(sinh, { "sinh(" + $0 + ")" }),
+        "cosh" : Operation.unaryOperation(cosh, { "cosh(" + $0 + ")" }),
+        "tanh" : Operation.unaryOperation(tanh, { "tanh(" + $0 + ")" }),
+        "ln" : Operation.unaryOperation(log, { "ln(" + $0 + ")" }),
+        "log" : Operation.unaryOperation(log10, { "log(" + $0 + ")" }),
+        "eˣ" : Operation.unaryOperation(exp, { "e^(" + $0 + ")" }),
+        "10ˣ" : Operation.unaryOperation({ pow(10, $0) }, { "10^(" + $0 + ")" }),
+        "x!" : Operation.unaryOperation(factorial, { "(" + $0 + ")!" }),
+        "xʸ" : Operation.binaryOperation(pow, { $0 + "^" + $1 }),
         ]
     
     mutating func performOperation(_ symbol: String) {
         if let operation = operations[symbol] {
             switch operation {
             case .constant(let value):
-                accumulator = value
-            case .unaryOperation(let function):
+                accumulator = (value, symbol)
+            case .unaryOperation(let function, let description):
                 if nil != accumulator {
-                    accumulator = function(accumulator!)
+                    accumulator = (function(accumulator!.0), description(accumulator!.1))
                 }
-            case .binaryOperation(let function):
+            case .binaryOperation(let function, let description):
+                performPendingBinaryOperation()
                 if nil != accumulator {
-                    pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)
+                    pendingBinaryOperation = PendingBinaryOperation(function: function, description: description, firstOperand: accumulator!)
                     accumulator = nil
                 }
             case .equals:
@@ -93,20 +94,24 @@ struct CalculatorBrain {
     
     private struct PendingBinaryOperation {
         let function: (Double, Double) -> Double
-        let firstOperand: Double
+        let description: (String, String) -> String
+        let firstOperand: (Double, String)
         
-        func perform(with secondOperand: Double) -> Double {
-            return function(firstOperand, secondOperand)
+        func perform(with secondOperand: (Double, String)) -> (Double, String) {
+            return (function(firstOperand.0, secondOperand.0), description(firstOperand.1, secondOperand.1))
         }
     }
     
     mutating func setOperand(_ operand: Double) {
-        accumulator = operand
+        accumulator = (operand, "\(operand)")
     }
     
     var result: Double? {
         get {
-            return accumulator
+            if nil != accumulator {
+                return accumulator!.0
+            }
+            return nil
         }
     }
     
@@ -115,4 +120,15 @@ struct CalculatorBrain {
             return nil != pendingBinaryOperation
         }
     }
+    
+    var description: String? {
+        get {
+            if resultIsPending {
+                return pendingBinaryOperation!.description(pendingBinaryOperation!.firstOperand.1, accumulator?.1 ?? "")
+            } else {
+                return accumulator?.1
+            }
+        }
+    }
+    
 }
