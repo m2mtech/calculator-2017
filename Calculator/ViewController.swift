@@ -72,6 +72,13 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func reset(_ sender: UIButton) {
+        brain = CalculatorBrain()
+        displayValue = 0
+        descriptionDisplay.text = " "
+        userIsInTheMiddleOfTyping = false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         adjustButtonLayout(for: view, isPortrait: traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular)
