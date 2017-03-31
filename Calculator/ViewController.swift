@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var descriptionDisplay: UILabel!
     
     var userIsInTheMiddleOfTyping = false
     
@@ -24,7 +25,17 @@ class ViewController: UIViewController {
                 display.text = textCurrentlyInDisplay + digit
             }
         } else {
-            display.text = "." == digit ? "0." : digit
+            switch digit {
+            case ".":
+                display.text = "0."
+            case "0":
+                if "0" == display.text {
+                    return
+                }
+                fallthrough
+            default:
+                display.text = digit
+            }
             userIsInTheMiddleOfTyping = true
         }
         
@@ -35,7 +46,7 @@ class ViewController: UIViewController {
             return Double(display.text!)!
         }
         set {
-            display.text = String(newValue)
+            display.text = String(newValue).beautifyNumbers()
         }
     }
     
@@ -52,6 +63,12 @@ class ViewController: UIViewController {
         
         if let result = brain.result {
             displayValue = result
+        }
+        
+        if let description = brain.description {
+            descriptionDisplay.text = description.beautifyNumbers() + (brain.resultIsPending ? "…" : "=")
+        } else {
+            descriptionDisplay.text = " "
         }
     }
     
@@ -93,6 +110,18 @@ extension UIButton {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         setBackgroundImage(image, for: state);
+    }
+}
+
+extension String {
+    func beautifyNumbers() -> String {
+        return self.replace(pattern: "\\.0+([^0-9]|$)", with: "$1")
+    }
+    
+    func replace(pattern: String, with replacement: String) -> String {
+        let regex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let range = NSMakeRange(0, self.characters.count)
+        return regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replacement)
     }
 }
 
