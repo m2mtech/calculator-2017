@@ -473,6 +473,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="decimalSeparatorButton" destination="b8R-P3-0Gz" id="SMz-lM-Xpz"/>
                         <outlet property="descriptionDisplay" destination="8OC-Hi-J4a" id="GcH-RE-oYO"/>
                         <outlet property="display" destination="err-MP-hEZ" id="3O7-Go-5jR"/>
                     </connections>

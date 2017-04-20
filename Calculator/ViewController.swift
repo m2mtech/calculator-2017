@@ -15,19 +15,23 @@ class ViewController: UIViewController {
     
     var userIsInTheMiddleOfTyping = false
     
+    private let decimalSeparator = NumberFormatter().decimalSeparator!
+
+    @IBOutlet weak var decimalSeparatorButton: UIButton!
+    
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         //print("\(digit) was touched")
         
         if userIsInTheMiddleOfTyping {
             let textCurrentlyInDisplay = display.text!
-            if "." != digit || !textCurrentlyInDisplay.contains(".") {
+            if decimalSeparator != digit || !textCurrentlyInDisplay.contains(decimalSeparator) {
                 display.text = textCurrentlyInDisplay + digit
             }
         } else {
             switch digit {
-            case ".":
-                display.text = "0."
+            case decimalSeparator:
+                display.text = "0" + decimalSeparator
             case "0":
                 if "0" == display.text {
                     return
@@ -38,18 +42,17 @@ class ViewController: UIViewController {
             }
             userIsInTheMiddleOfTyping = true
         }
-        
     }
     
     var displayValue: Double {
         get {
-            return Double(display.text!)!
+            return (NumberFormatter().number(from: display.text!)?.doubleValue)!
         }
         set {
             display.text = String(newValue).beautifyNumbers()
         }
     }
-    
+
     private var brain = CalculatorBrain()
     
     @IBAction func performOperation(_ sender: UIButton) {
@@ -82,7 +85,7 @@ class ViewController: UIViewController {
     @IBAction func backSpace(_ sender: UIButton) {
         if userIsInTheMiddleOfTyping, var text = display.text {
             text.remove(at: text.index(before: text.endIndex))
-            if text.isEmpty {
+            if text.isEmpty || "0" == text {
                 text = "0"
                 userIsInTheMiddleOfTyping = false
             }
@@ -93,6 +96,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         adjustButtonLayout(for: view, isPortrait: traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular)
+        decimalSeparatorButton.setTitle(decimalSeparator, for: .normal);
     }
     
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -115,7 +119,6 @@ class ViewController: UIViewController {
             }
         }
     }
-
 }
 
 extension UIButton {
@@ -132,14 +135,26 @@ extension UIButton {
 }
 
 extension String {
-    func beautifyNumbers() -> String {
-        return self.replace(pattern: "\\.0+([^0-9]|$)", with: "$1")
-    }
+    static let DecimalDigits = 6
     
-    func replace(pattern: String, with replacement: String) -> String {
-        let regex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-        let range = NSMakeRange(0, self.characters.count)
-        return regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replacement)
+    func beautifyNumbers() -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = String.DecimalDigits
+
+        var text = self as NSString
+        var numbers = [String]()
+        let regex = try! NSRegularExpression(pattern: "[.0-9]+", options: .caseInsensitive)
+        let matches = regex.matches(in: self, options: [], range: NSMakeRange(0, text.length))
+        numbers = matches.map { text.substring(with: $0.range) }
+        
+        for number in numbers {
+            text = text.replacingOccurrences(
+                of: number,
+                with: formatter.string(from: NSNumber(value: Double(number)!))!
+            ) as NSString
+        }
+        return text as String;
     }
 }
 
