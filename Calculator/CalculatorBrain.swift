@@ -29,6 +29,7 @@ struct CalculatorBrain {
     
     private enum Operation {
         case constant(Double)
+        case nullaryOperation(() -> Double, String)
         case unaryOperation((Double) -> Double, (String) -> String)
         case binaryOperation((Double, Double) -> Double, (String, String) -> String)
         case equals
@@ -60,6 +61,8 @@ struct CalculatorBrain {
         "10ˣ" : Operation.unaryOperation({ pow(10, $0) }, { "10^(" + $0 + ")" }),
         "x!" : Operation.unaryOperation(factorial, { "(" + $0 + ")!" }),
         "xʸ" : Operation.binaryOperation(pow, { $0 + "^" + $1 }),
+        
+        "rand" : Operation.nullaryOperation({ Double(arc4random()) / Double(UInt32.max) }, "rand()")
         ]
     
     mutating func performOperation(_ symbol: String) {
@@ -67,6 +70,8 @@ struct CalculatorBrain {
             switch operation {
             case .constant(let value):
                 accumulator = (value, symbol)
+            case .nullaryOperation(let function, let description):
+                accumulator = (function(), description)
             case .unaryOperation(let function, let description):
                 if nil != accumulator {
                     accumulator = (function(accumulator!.0), description(accumulator!.1))
