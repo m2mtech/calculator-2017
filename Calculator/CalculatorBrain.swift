@@ -84,14 +84,17 @@ struct CalculatorBrain {
         stack.append(Element.operation(symbol))
     }
     
+    @available(*, deprecated, message: "no longer needed ...")
     var result: Double? {
         return evaluate().result
     }
     
+    @available(*, deprecated, message: "no longer needed ...")
     var resultIsPending: Bool {
         return evaluate().isPending
     }
     
+    @available(*, deprecated, message: "no longer needed ...")
     var description: String? {
         return evaluate().description
     }

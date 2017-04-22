@@ -64,12 +64,14 @@ class ViewController: UIViewController {
             brain.performOperation(mathematicalSymbol)
         }
         
-        if let result = brain.result {
+        let evaluated = brain.evaluate()
+        
+        if let result = evaluated.result {
             displayValue = result
         }
         
-        if let description = brain.description {
-            descriptionDisplay.text = description.beautifyNumbers() + (brain.resultIsPending ? "…" : "=")
+        if "" != evaluated.description {
+            descriptionDisplay.text = evaluated.description.beautifyNumbers() + (evaluated.isPending ? "…" : "=")
         } else {
             descriptionDisplay.text = " "
         }
