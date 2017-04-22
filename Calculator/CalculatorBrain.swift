@@ -25,6 +25,8 @@ func factorial(_ op1: Double) -> Double {
 
 struct CalculatorBrain {
     
+    private var stack = [Operation]()
+    
     private var accumulator: (Double, String)?
     
     private enum Operation {
@@ -33,6 +35,8 @@ struct CalculatorBrain {
         case unaryOperation((Double) -> Double, (String) -> String)
         case binaryOperation((Double, Double) -> Double, (String, String) -> String)
         case equals
+        case operand(Double)
+        case variable(String)
     }
     
     private let operations: Dictionary<String,Operation> = [
@@ -84,6 +88,7 @@ struct CalculatorBrain {
                 }
             case .equals:
                 performPendingBinaryOperation()
+            default: break // nothing to do for operands and variables
             }
         }
     }
@@ -109,6 +114,10 @@ struct CalculatorBrain {
     
     mutating func setOperand(_ operand: Double) {
         accumulator = (operand, "\(operand)")
+    }
+    
+    mutating func setOperand(variable named: String) {
+        stack.append(Operation.variable(named))
     }
     
     var result: Double? {
