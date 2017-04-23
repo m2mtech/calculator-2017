@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     var userIsInTheMiddleOfTyping = false
     
     private let decimalSeparator = NumberFormatter().decimalSeparator!
-
+    
     @IBOutlet weak var decimalSeparatorButton: UIButton!
     
     @IBAction func touchDigit(_ sender: UIButton) {
@@ -52,19 +52,11 @@ class ViewController: UIViewController {
             display.text = String(newValue).beautifyNumbers()
         }
     }
-
+    
     private var brain = CalculatorBrain()
     
-    @IBAction func performOperation(_ sender: UIButton) {
-        if userIsInTheMiddleOfTyping {
-            brain.setOperand(displayValue)
-            userIsInTheMiddleOfTyping = false
-        }
-        if let mathematicalSymbol = sender.currentTitle {
-            brain.performOperation(mathematicalSymbol)
-        }
-        
-        let evaluated = brain.evaluate()
+    private func displayResult() {
+        let evaluated = brain.evaluate(using: variables)
         
         if let result = evaluated.result {
             displayValue = result
@@ -77,11 +69,23 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func performOperation(_ sender: UIButton) {
+        if userIsInTheMiddleOfTyping {
+            brain.setOperand(displayValue)
+            userIsInTheMiddleOfTyping = false
+        }
+        if let mathematicalSymbol = sender.currentTitle {
+            brain.performOperation(mathematicalSymbol)
+        }
+        displayResult()
+    }
+    
     @IBAction func reset(_ sender: UIButton) {
         brain = CalculatorBrain()
         displayValue = 0
         descriptionDisplay.text = " "
         userIsInTheMiddleOfTyping = false
+        variables = Dictionary<String,Double>()
     }
     
     @IBAction func backSpace(_ sender: UIButton) {
@@ -93,6 +97,20 @@ class ViewController: UIViewController {
             }
             display.text = text
         }
+    }
+    
+    private var variables = Dictionary<String,Double>()
+    
+    @IBAction func storeToMemory(_ sender: UIButton) {
+        variables["M"] = displayValue
+        userIsInTheMiddleOfTyping = false
+        displayResult()
+     }
+    
+    @IBAction func callMemory(_ sender: UIButton) {
+        brain.setOperand(variable: "M")
+        userIsInTheMiddleOfTyping = false
+        displayResult()
     }
     
     override func viewDidLoad() {
@@ -143,7 +161,7 @@ extension String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = String.DecimalDigits
-
+        
         var text = self as NSString
         var numbers = [String]()
         let regex = try! NSRegularExpression(pattern: "[.0-9]+", options: .caseInsensitive)
@@ -154,7 +172,7 @@ extension String {
             text = text.replacingOccurrences(
                 of: number,
                 with: formatter.string(from: NSNumber(value: Double(number)!))!
-            ) as NSString
+                ) as NSString
         }
         return text as String;
     }
