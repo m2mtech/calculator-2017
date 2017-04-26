@@ -89,7 +89,7 @@ class ViewController: UIViewController {
         variables = Dictionary<String,Double>()
     }
     
-    @IBAction func backSpace(_ sender: UIButton) {
+    @IBAction func undo(_ sender: UIButton) {
         if userIsInTheMiddleOfTyping, var text = display.text {
             text.remove(at: text.index(before: text.endIndex))
             if text.isEmpty || "0" == text {
@@ -97,6 +97,9 @@ class ViewController: UIViewController {
                 userIsInTheMiddleOfTyping = false
             }
             display.text = text
+        } else {
+            brain.undo()
+            displayResult()
         }
     }
     

@@ -84,6 +84,12 @@ struct CalculatorBrain {
         stack.append(Element.operation(symbol))
     }
     
+    mutating func undo() {
+        if !stack.isEmpty {
+            stack.removeLast()
+        }        
+    }
+    
     @available(*, deprecated, message: "no longer needed ...")
     var result: Double? {
         return evaluate().result
