@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var display: UILabel!
     @IBOutlet weak var descriptionDisplay: UILabel!
+    @IBOutlet weak var memoryDisplay: UILabel!
     
     var userIsInTheMiddleOfTyping = false
     
@@ -99,7 +100,11 @@ class ViewController: UIViewController {
         }
     }
     
-    private var variables = Dictionary<String,Double>()
+    private var variables = Dictionary<String,Double>() {
+        didSet {
+            memoryDisplay.text = variables.flatMap{$0+":\($1)"}.joined(separator: ", ").beautifyNumbers()
+        }
+    }
     
     @IBAction func storeToMemory(_ sender: UIButton) {
         variables["M"] = displayValue
