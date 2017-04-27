@@ -40,7 +40,12 @@ struct CalculatorBrain {
         case binaryOperation((Double, Double) -> Double, (String, String) -> String)
         case equals
     }
-    
+
+    private enum ErrorOperation {
+        case unaryOperation((Double) -> String?)
+        case binaryOperation((Double, Double) -> String?)
+    }
+
     private let operations: Dictionary<String,Operation> = [
         "π": Operation.constant(Double.pi),
         "e": Operation.constant(M_E),
@@ -70,7 +75,15 @@ struct CalculatorBrain {
         
         "rand" : Operation.nullaryOperation({ Double(arc4random()) / Double(UInt32.max) }, "rand()")
     ]
-    
+
+    private let errorOperations: Dictionary<String,ErrorOperation> = [
+        "√": ErrorOperation.unaryOperation({ 0.0 > $0 ? "SQRT of negative Number" : nil }),
+        "÷": ErrorOperation.binaryOperation({ 1e-8 >= fabs($0.1) ? "Division by Zero" : nil }),
+        "x⁻¹" : ErrorOperation.unaryOperation({ 1e-8 > fabs($0) ? "Division by Zero" : nil }),
+        "ln" : ErrorOperation.unaryOperation({ 0 > $0 ? "LN of negative Number" : nil }),
+        "log" : ErrorOperation.unaryOperation({ 0 > $0 ? "LOG of negative Number" : nil }),
+        "x!" : ErrorOperation.unaryOperation({ 0 > $0 ? "Factorial of negative Number" : nil })
+    ]
     
     mutating func setOperand(_ operand: Double) {
         stack.append(Element.operand(operand))
@@ -106,13 +119,16 @@ struct CalculatorBrain {
     }
     
     func evaluate(using variables: Dictionary<String,Double>? = nil)
-        -> (result: Double?, isPending: Bool, description: String)
+        -> (result: Double?, isPending: Bool, description: String, error: String?)
     {
         var accumulator: (Double, String)?
         
         var pendingBinaryOperation: PendingBinaryOperation?
         
+        var error: String?
+        
         struct PendingBinaryOperation {
+            let symbol: String
             let function: (Double, Double) -> Double
             let description: (String, String) -> String
             let firstOperand: (Double, String)
@@ -124,6 +140,10 @@ struct CalculatorBrain {
         
         func performPendingBinaryOperation() {
             if nil != pendingBinaryOperation && nil != accumulator {
+                if let errorOperation = errorOperations[pendingBinaryOperation!.symbol],
+                    case .binaryOperation(let errorFunction) = errorOperation {
+                    error = errorFunction(pendingBinaryOperation!.firstOperand.0, accumulator!.0)
+                }
                 accumulator = pendingBinaryOperation!.perform(with: accumulator!)
                 pendingBinaryOperation = nil
             }
@@ -157,12 +177,16 @@ struct CalculatorBrain {
                         accumulator = (function(), description)
                     case .unaryOperation(let function, let description):
                         if nil != accumulator {
+                            if let errorOperation = errorOperations[symbol],
+                            case .unaryOperation(let errorFunction) = errorOperation {
+                                error = errorFunction(accumulator!.0)
+                            }
                             accumulator = (function(accumulator!.0), description(accumulator!.1))
                         }
                     case .binaryOperation(let function, let description):
                         performPendingBinaryOperation()
                         if nil != accumulator {
-                            pendingBinaryOperation = PendingBinaryOperation(function: function, description: description, firstOperand: accumulator!)
+                            pendingBinaryOperation = PendingBinaryOperation(symbol: symbol, function: function, description: description, firstOperand: accumulator!)
                             accumulator = nil
                         }
                     case .equals:
@@ -178,6 +202,6 @@ struct CalculatorBrain {
             }
         }
         
-        return (result, nil != pendingBinaryOperation, description ?? "")
+        return (result, nil != pendingBinaryOperation, description ?? "", error)
     }
 }

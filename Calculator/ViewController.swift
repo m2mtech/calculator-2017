@@ -59,7 +59,9 @@ class ViewController: UIViewController {
     private func displayResult() {
         let evaluated = brain.evaluate(using: variables)
         
-        if let result = evaluated.result {
+        if let error = evaluated.error {
+            display.text = error
+        } else if let result = evaluated.result {
             displayValue = result
         }
         
