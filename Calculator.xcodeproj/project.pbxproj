@@ -94,6 +94,7 @@
 				5B2100281E83344A00D18EB4 /* CalculatorBrain.swift */,
 				5BBA299B1E81E38D00333367 /* ViewController.swift */,
 				5BBA299D1E81E38D00333367 /* Main.storyboard */,
+				5BBA29A01E81E38D00333367 /* Assets.xcassets */,
 				5BBA29AB1E81E4FC00333367 /* Supporting Files */,
 			);
 			path = Calculator;
@@ -103,7 +104,6 @@
 			isa = PBXGroup;
 			children = (
 				5BBA29991E81E38D00333367 /* AppDelegate.swift */,
-				5BBA29A01E81E38D00333367 /* Assets.xcassets */,
 				5BBA29A21E81E38D00333367 /* LaunchScreen.storyboard */,
 				5BBA29A51E81E38D00333367 /* Info.plist */,
 			);
@@ -417,6 +417,7 @@
 				5B72822B1E8CF23E00CDF81B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5BBA29911E81E38D00333367 /* Build configuration list for PBXProject "Calculator" */ = {
 			isa = XCConfigurationList;
