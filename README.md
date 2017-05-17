@@ -4,6 +4,7 @@ written in Xcode 8.2.1 for iOS 10.2
 
 ### various versions are available via tags and releases:
 
++ [Assignment #2 Extra Task #3](https://cs193p.m2m.at/cs193p-assignment-2-extra-task-3-winter-2017/) -> [v2.1.3](https://github.com/m2mtech/calculator-2017/releases/tag/v2.1.3)
 + [Assignment #2 Extra Task #2](https://cs193p.m2m.at/cs193p-assignment-2-extra-task-2-winter-2017/) -> [v2.1.2](https://github.com/m2mtech/calculator-2017/releases/tag/v2.1.2)
 + [Assignment #2 Extra Task #1](https://cs193p.m2m.at/cs193p-assignment-2-extra-task-1-winter-2017/) -> [v2.1.1](https://github.com/m2mtech/calculator-2017/releases/tag/v2.1.1)
 

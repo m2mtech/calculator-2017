@@ -25,6 +25,15 @@ func factorial(_ op1: Double) -> Double {
 
 struct CalculatorBrain {
     
+    mutating func addUnaryOperation(
+        named symbol: String,
+        _ operation: @escaping (Double) -> Double,
+        _ description: @escaping (String) -> String
+        )
+    {
+        operations[symbol] = Operation.unaryOperation(operation, description)
+    }
+    
     private var stack = [Element]()
     
     private enum Element {
@@ -40,13 +49,13 @@ struct CalculatorBrain {
         case binaryOperation((Double, Double) -> Double, (String, String) -> String)
         case equals
     }
-
+    
     private enum ErrorOperation {
         case unaryOperation((Double) -> String?)
         case binaryOperation((Double, Double) -> String?)
     }
-
-    private let operations: Dictionary<String,Operation> = [
+    
+    private var operations: Dictionary<String,Operation> = [
         "π": Operation.constant(Double.pi),
         "e": Operation.constant(M_E),
         "√": Operation.unaryOperation(sqrt, { "√(" + $0 + ")" }),
@@ -75,7 +84,7 @@ struct CalculatorBrain {
         
         "rand" : Operation.nullaryOperation({ Double(arc4random()) / Double(UInt32.max) }, "rand()")
     ]
-
+    
     private let errorOperations: Dictionary<String,ErrorOperation> = [
         "√": ErrorOperation.unaryOperation({ 0.0 > $0 ? "SQRT of negative Number" : nil }),
         "÷": ErrorOperation.binaryOperation({ 1e-8 >= fabs($0.1) ? "Division by Zero" : nil }),
@@ -100,7 +109,7 @@ struct CalculatorBrain {
     mutating func undo() {
         if !stack.isEmpty {
             stack.removeLast()
-        }        
+        }
     }
     
     @available(*, deprecated, message: "no longer needed ...")
@@ -178,7 +187,7 @@ struct CalculatorBrain {
                     case .unaryOperation(let function, let description):
                         if nil != accumulator {
                             if let errorOperation = errorOperations[symbol],
-                            case .unaryOperation(let errorFunction) = errorOperation {
+                                case .unaryOperation(let errorFunction) = errorOperation {
                                 error = errorFunction(accumulator!.0)
                             }
                             accumulator = (function(accumulator!.0), description(accumulator!.1))

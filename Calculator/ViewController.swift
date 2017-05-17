@@ -127,6 +127,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         adjustButtonLayout(for: view, isPortrait: traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular)
         decimalSeparatorButton.setTitle(decimalSeparator, for: .normal);
+        
+        brain.addUnaryOperation(named: "✅", { [unowned self] (operand) -> Double in
+            self.display.textColor = UIColor.green
+            return sqrt(operand)
+        }) { "√(" + $0 + ")" }
     }
     
     override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
